@@ -1,20 +1,10 @@
 import React from "react";
 import { Card, Container, Row } from "react-bootstrap";
-import { useRouter } from "next/router";
+const { Pool } = require("pg");
+const { config } = require("../config");
+const pool = new Pool(config);
 
-const PeoplePage = () => {
-  const { query } = useRouter();
-  const [people, setPeople] = React.useState([]);
-
-  const fetchPeople = async (eventId) => {
-    const response = await fetch(`/api/people?eventId=${eventId}`);
-    const res = await response.json();
-    setPeople(res.people);
-  };
-
-  React.useEffect(async () => {
-    await fetchPeople(query.eventId);
-  }, []);
+const PeoplePage = ({ people }) => {
   return (
     <Container>
       <Row className="justify-content-md-between">
@@ -29,4 +19,23 @@ const PeoplePage = () => {
     </Container>
   );
 };
+
+export async function getServerSideProps(context) {
+  const { eventId } = context.params;
+  console.log(eventId);
+  const query = `SELECT * FROM people WHERE event_id='${eventId}';`;
+
+  const people = [];
+  const client = await pool.connect();
+  const res = await client.query(query);
+  if (res.rows.length > 0) {
+    res.rows.forEach((row) => {
+      people.push(row);
+    });
+  }
+  return {
+    props: { people }
+  };
+}
+
 export default PeoplePage;

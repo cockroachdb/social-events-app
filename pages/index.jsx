@@ -2,6 +2,9 @@ import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Container, Row, Card, Button, Form } from "react-bootstrap";
+const { Pool } = require("pg");
+const { config } = require("../config");
+const pool = new Pool(config);
 
 const Home = ({ error, events }) => {
   const [name, setName] = React.useState("");
@@ -33,9 +36,9 @@ const Home = ({ error, events }) => {
       <Container>
         <h1>Social Events</h1>
         <p>
-          <Link href="add-event">Share</Link> and attend events..
+          <Link href="/add-event">Share</Link> and attend events..
         </p>
-        <Link href="add-event">
+        <Link href="/add-event">
           <Button variant="primary">Add event &rarr;</Button>
         </Link>
         <Container>
@@ -56,7 +59,7 @@ const Home = ({ error, events }) => {
                   <Button variant="primary" onClick={() => onRSVP(event.id)}>
                     RSVP &rarr;
                   </Button>
-                  <Link href={"" + event.id}>
+                  <Link href={`/${event.id}`}>
                     <Button variant="primary">People who have RSVP'd</Button>
                   </Link>
                 </Card.Body>
@@ -73,14 +76,20 @@ const Home = ({ error, events }) => {
   );
 };
 
-Home.getInitialProps = async (ctx) => {
-  try {
-    const response = await fetch("/api/events");
-    const events = await response.json();
-    return events;
-  } catch (error) {
-    return { error };
+export async function getServerSideProps() {
+  const events = [];
+  const client = await pool.connect();
+  const res = await client.query("SELECT * FROM events;");
+
+  if (res.rows.length > 0) {
+    res.rows.forEach((row) => {
+      console.log(row);
+      events.push(row);
+    });
   }
-};
+  return {
+    props: { events: JSON.parse(JSON.stringify(events)) }
+  };
+}
 
 export default Home;

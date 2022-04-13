@@ -2,15 +2,11 @@ const { Pool } = require("pg");
 const { config } = require("../../config");
 const pool = new Pool(config);
 
-module.exports = async (request, response) => {
-  const events = [];
-  const client = await pool.connect();
-  await client.query("SELECT * FROM events;", (err, res) => {
-    if (err) {
-      response.status(500).json({
-        message: err.message
-      });
-    }
+export default async function handler(request, response) {
+  try {
+    const events = [];
+    const client = await pool.connect();
+    const res = await client.query("SELECT * FROM events;");
     if (res.rows.length > 0) {
       res.rows.forEach((row) => {
         console.log(row);
@@ -20,5 +16,9 @@ module.exports = async (request, response) => {
     response.json({
       events: events
     });
-  });
-};
+  } catch (err) {
+    response.status(500).json({
+      message: err.message
+    });
+  }
+}

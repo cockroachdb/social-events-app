@@ -2,20 +2,20 @@ const { Pool } = require("pg");
 const { config } = require("../../config");
 const pool = new Pool(config);
 
-module.exports = async (request, response) => {
+export default async function handler(request, response) {
   const { name, eventId } = request.body;
-  const query = `INSERT INTO people (name, event_id) VALUES ('${name}',
-'${eventId}');`;
-  const client = await pool.connect();
-  await client.query(query, (err, res) => {
-    if (err) {
-      response.status(500).json({
-        message: err.message
-      });
-    }
+  const query = `INSERT INTO people (name, event_id) VALUES ('${name}', '${eventId}');`;
+
+  try {
+    const client = await pool.connect();
+    const res = await client.query(query);
     console.log(res);
     response.json({
       message: "Success!"
     });
-  });
-};
+  } catch (err) {
+    response.status(500).json({
+      message: err.message
+    });
+  }
+}
