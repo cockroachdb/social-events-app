@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, Container, Row } from "react-bootstrap";
 import { useRouter } from "next/router";
 
 const PeoplePage = () => {
