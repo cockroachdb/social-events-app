@@ -50,18 +50,18 @@ const Home = ({ error, events }) => {
                   <Card.Text>{event.description}</Card.Text>
                   <Card.Text>Date: {event.event_date}</Card.Text>
                   <Card.Text>Time: {event.event_time}</Card.Text>
-                  <Form.Control
-                    type="text"
-                    placeholder="Write your name to RSVP.."
-                    value={name}
-                    onInput={(e) => setName(e.target.value)}
-                  />
                   <Button variant="primary" onClick={() => onRSVP(event.id)}>
                     RSVP &rarr;
                   </Button>
                   <Link href={`/${event.id}`}>
                     <Button variant="primary">People who have RSVP'd</Button>
                   </Link>
+                  <Form.Control
+                    type="text"
+                    placeholder="Write your name to RSVP.."
+                    value={name}
+                    onInput={(e) => setName(e.target.value)}
+                  />
                 </Card.Body>
               </Card>
             ))}

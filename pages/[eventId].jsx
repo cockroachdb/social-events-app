@@ -1,4 +1,6 @@
 import React from "react";
+import Head from "next/head";
+import Link from "next/link";
 import { Card, Container, Row } from "react-bootstrap";
 const { Pool } = require("pg");
 const { config } = require("../config");
@@ -6,16 +8,32 @@ const pool = new Pool(config);
 
 const PeoplePage = ({ people }) => {
   return (
-    <Container>
-      <Row className="justify-content-md-between">
-        {people.map((p) => (
-          <Card key={p.id} className="sml-card">
-            <Card.Body>
-              <Card.Text>{p.name}</Card.Text>
-            </Card.Body>
-          </Card>
-        ))}
-      </Row>
+    <Container className="md-container">
+      <Head>
+        <title>Social Events</title>
+        <link rel="icon" href="/favicon-32x32.png" />
+      </Head>
+      <Container>
+        <Container>
+          <h1>Social Events</h1>
+          <p>
+            <Link href="add-event">Share</Link> and attend{" "}
+            <Link href="/">events</Link> ..
+          </p>
+          <Row className="justify-content-md-between">
+            {people.map((p) => (
+              <Card key={p.id} className="sml-card">
+                <Card.Body>
+                  <Card.Text>{p.name}</Card.Text>
+                </Card.Body>
+              </Card>
+            ))}
+          </Row>
+        </Container>
+      </Container>
+      <footer className="cntr-footer">
+        <p>Social Events (c) 2022</p>
+      </footer>
     </Container>
   );
 };
