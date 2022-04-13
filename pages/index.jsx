@@ -1,89 +1,86 @@
-import Head from 'next/head'
-import { Container, Row, Card, Button } from 'react-bootstrap'
+import React from "react";
+import Head from "next/head";
+import Link from "next/link";
+import { Container, Row, Card, Button, Form } from "react-bootstrap";
 
-export default function Home() {
+const Home = ({ error, events }) => {
+  const [name, setName] = React.useState("");
+  const onRSVP = async (eventId) => {
+    const response = await fetch("/api/rsvp", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: name,
+        eventId: eventId
+      })
+    });
+    if (response.status == 200) {
+      alert("RSVP'd!");
+    } else {
+      alert("Error!");
+    }
+  };
+
   return (
     <Container className="md-container">
       <Head>
-        <title>ReactJS with react-bootstrap</title>
+        <title>Social Events</title>
         <link rel="icon" href="/favicon-32x32.png" />
       </Head>
       <Container>
-        <h1>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h1>Social Events</h1>
         <p>
-          Get started by editing <code>pages/index.js</code>
+          <Link href="add-event">Share</Link> and attend events..
         </p>
+        <Link href="add-event">
+          <Button variant="primary">Add event &rarr;</Button>
+        </Link>
         <Container>
           <Row className="justify-content-md-between">
-            <Card className="sml-card">
-              <Card.Body>
-                <Card.Title>Documentation</Card.Title>
-                <Card.Text>
-                  Find in-depth information about Next.js features and API.
-                </Card.Text>
-                <Button variant="primary" href="https://nextjs.org/docs">
-                  More &rarr;
-                </Button>
-              </Card.Body>
-            </Card>
-            <Card className="sml-card">
-              <Card.Body>
-                <Card.Title>Learn</Card.Title>
-                <Card.Text>
-                  Learn about Next.js in an interactive course with quizzes!
-                </Card.Text>
-                <Button variant="primary" href="https://nextjs.org/learn">
-                  More &rarr;
-                </Button>
-              </Card.Body>
-            </Card>
-          </Row>
-          <Row className="justify-content-md-between">
-            <Card className="sml-card">
-              <Card.Body>
-                <Card.Title>Examples</Card.Title>
-                <Card.Text>
-                  Discover and deploy boilerplate example Next.js projects.
-                </Card.Text>
-                <Button
-                  variant="primary"
-                  href="https://github.com/vercel/next.js/tree/canary/examples"
-                >
-                  More &rarr;
-                </Button>
-              </Card.Body>
-            </Card>
-            <Card className="sml-card">
-              <Card.Body>
-                <Card.Title>Deploy</Card.Title>
-                <Card.Text>
-                  Instantly deploy your Next.js site to a public URL with
-                  Vercel.
-                </Card.Text>
-                <Button
-                  variant="primary"
-                  href="https://vercel.com/new?utm_source=github&utm_medium=example&utm_campaign=next-example"
-                >
-                  More &rarr;
-                </Button>
-              </Card.Body>
-            </Card>
+            {events.map((event) => (
+              <Card key={event.id} className="sml-card">
+                <Card.Body>
+                  <Card.Title>{event.title}</Card.Title>
+                  <Card.Text>{event.description}</Card.Text>
+                  <Card.Text>Date: {event.event_date}</Card.Text>
+                  <Card.Text>Time: {event.event_time}</Card.Text>
+                  <Form.Control
+                    type="text"
+                    placeholder="Write your name to RSVP.."
+                    value={name}
+                    onInput={(e) => setName(e.target.value)}
+                  />
+                  <Button variant="primary" onClick={() => onRSVP(event.id)}>
+                    RSVP &rarr;
+                  </Button>
+                  <Link href={"" + event.id}>
+                    <Button variant="primary">People who have RSVP'd</Button>
+                  </Link>
+                </Card.Body>
+              </Card>
+            ))}
           </Row>
         </Container>
       </Container>
 
       <footer className="cntr-footer">
-        <a
-          href="https://vercel.com?filter=next.js&utm_source=github&utm_medium=example&utm_campaign=next-example"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="sml-logo" />
-        </a>
+        <p>Social Events (c) 2022</p>
       </footer>
     </Container>
-  )
-}
+  );
+};
+
+Home.getInitialProps = async (ctx) => {
+  try {
+    const response = await fetch("/api/events");
+    const events = await response.json();
+    return events;
+  } catch (error) {
+    return { error };
+  }
+};
+
+export default Home;
