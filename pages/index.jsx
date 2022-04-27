@@ -2,8 +2,8 @@ import React from "react";
 import Head from "next/head";
 import Link from "next/link";
 import { Container, Row, Card, Button, Form } from "react-bootstrap";
-const { Pool } = require("pg");
-const { config } = require("../config");
+import { Pool } from "pg/lib";
+import { config } from "../config";
 const pool = new Pool(config);
 
 const Home = ({ error, events }) => {

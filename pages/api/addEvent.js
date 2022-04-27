@@ -1,5 +1,5 @@
-const { Pool } = require("pg");
-const { config } = require("../../config");
+import { Pool } from "pg/lib";
+import { config } from "../../config";
 const pool = new Pool(config);
 
 export default async function handler(request, response) {
